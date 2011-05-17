@@ -1,0 +1,6 @@
+I wanted to use this file to attribute some js and icon files.
+
+This code uses jqplot for charting. It is an excellent chart library. Check it out at jqplot.com !
+
+The icon was obtained from the icon set at http://www.smashingmagazine.com/2009/01/23/friday-freebies-flavours-icon-set-and-cute-tweeters-icon-set/ . 
+

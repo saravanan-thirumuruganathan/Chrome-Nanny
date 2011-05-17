@@ -1,0 +1,82 @@
+<head>
+	<link href="css/jquery-ui.custom.css" rel="stylesheet" type="text/css"> 
+	<link href="css/beProductive.css" rel="stylesheet" type="text/css"> 
+
+	<script type="text/javascript" src="js/jquery-1.4.2.min.js"></script>
+	<script type="text/javascript" src="js/jquery-ui.custom.min.js"></script>
+
+	<script type="text/javascript" src="js/utils.js"></script>
+	<script type="text/javascript" src="js/StorageManager.js"></script>
+	<script type="text/javascript" src="js/options.js"></script>
+	<script type="text/javascript" src="js/popup.js"></script>
+
+	<script type="text/javascript">
+
+		$(document).ready(function() {
+			fillFieldsInPopup();
+		});
+            
+	</script>
+
+</head>
+
+<body>
+	<div style="height:320px;width:480px">
+		<div style='float:left;width:100%;margin-top:10px;margin-bottom:10px;'> 
+			<div id="t_home_section" style="text-align:center">
+					<span class="sub section">Chrome Nanny !</span>
+			</div>
+			<p/>
+			<div>
+
+				<table  id='lockdownPopupTbl' border=0 nowrap cellspacing ='0' cellpadding='0' class='ModuleSection' align='center' width='80%'>
+					<tr class='tDataGridHeader' >
+						<td width='100%' align='center'>BlockSets Locked Down Now!</td>
+					</tr>
+					<tr class='tDataGridElement' >
+					</tr>
+				</table>
+				
+				<p/>
+
+				<table  id='blockedUrlTbl' border=0 nowrap cellspacing ='0' cellpadding='0' class='ModuleSection' align='center' width='80%'>
+					<tr class='tDataGridHeader' >
+						<td width='100%' align='center'>URLs Blocked Now !</td>
+					</tr>
+					<tr class='tDataGridElement' >
+					</tr>
+				</table>
+
+				<p/>
+
+				<table  id='allowedUrlTbl' border=0 nowrap cellspacing ='0' cellpadding='0' class='ModuleSection' align='center' width='80%'>
+					<tr class='tDataGridHeader' >
+						<td width='100%' align='center' colspan="2">URLs Allowed Now !</td>
+					</tr>
+					<tr class='tDataGridElement' >
+					</tr>
+				</table>
+
+				<p/>
+
+				<table  id='whiteListedUrlTbl' border=0 nowrap cellspacing ='0' cellpadding='0' class='ModuleSection' align='center' width='80%'>
+					<tr class='tDataGridHeader' >
+						<td width='100%' align='center' colspan="2">Time Spent on White Listed URLs Today </td>
+					</tr>
+					<tr class='tDataGridElement' >
+					</tr>
+				</table>
+
+				<p/>
+				<table  id='addnlHelp' border=0 nowrap cellspacing ='0' cellpadding='0' class='ModuleSection' align='center' width='80%'>
+					<tr class='tDataGridHeader' >
+						<td width='100%' align='center' colspan="2">About Chrome Nanny</td>
+					</tr>
+					<tr class='tDataGridElement' >
+						<td width='100%' colspan="2">Chrome Nanny is a LeechBlock like extension that aims to improve your productivity by blocking time consuming sites. It is developed by <a href='http://saravananthirumuruganathan.wordpress.com/' target='_blank'>Saravanan Thirumuruganathan</a>. Please visit the post <a href='http://saravananthirumuruganathan.wordpress.com/2010/05/05/instructions-for-chrome-nanny-a-leech-block-like-extension-for-chrome/' target='_blank'>Instructions For Chrome Nanny</a> for additional information. For the features planned in future checkout the <a href='http://saravananthirumuruganathan.wordpress.com/2010/08/05/chrome-nanny-road-map/'>Chrome Nanny's Roadmap.</a></td>
+					</tr>
+				</table>
+			</div>
+		</div>
+	</div>
+</body>

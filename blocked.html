@@ -1,0 +1,38 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+	<head>
+	<script type="text/javascript" src="js/jquery-1.4.2.min.js"></script>
+	<title>Site Blocked</title>
+	<style type="text/css">
+		body { font-family:sans-serif; text-align:center; }
+		div { margin-bottom:3em; }
+		h1 { line-height:48px; margin-bottom:2em; }
+		h1, h1 img { vertical-align:middle; }
+		h1 img { margin-right:12px; }
+		#blockedURL { font-weight:bold; }
+	</style>
+	</head>
+	<body>
+
+	<h1><img src="icon.png" height="48" width="48" /> Shouldn't you be working?</h1>
+
+	<div>
+	The site you are attempting to access has been blocked by <a href="https://chrome.google.com/extensions/detail/gpdgmmdbbbchchonpfanphofpplhmcmn">Chrome Nanny</a>.
+	</div>
+
+	<div id="blockedURL"></div>
+
+	<div>
+	You can <a id="clickHere">click here</a> to access the page once the site is no longer blocked.
+	</div>
+
+	<script type="text/javascript">
+		$(function(){
+			var l=String(window.location);
+			var u=l.substr(l.indexOf('#')+1);
+			$('#blockedURL').html(u);
+			$('#clickHere').attr('href', u);
+		})
+	</script>
+	</body>
+</html>

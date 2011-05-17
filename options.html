@@ -1,0 +1,647 @@
+<html>
+	<head>
+		<title>Chrome Nanny : Options </title>
+		<link href="css/jquery-ui.custom.css" rel="stylesheet" type="text/css"> 
+		<link href="css/jquery.jqplot.css" rel="stylesheet" type="text/css"> 
+		<link href="css/beProductive.css" rel="stylesheet" type="text/css"> 
+
+		<script type="text/javascript" src="js/jquery-1.4.2.min.js"></script>
+		<script type="text/javascript" src="js/jquery-ui.custom.min.js"></script>
+
+		<script type="text/javascript" src="js/jquery.jqplot.min.js"></script>
+		<script type="text/javascript" src="js/jqplot.barRenderer.min.js"></script>
+		<script type="text/javascript" src="js/jqplot.categoryAxisRenderer.min.js"></script>
+		<script type="text/javascript" src="js/jqplot.pieRenderer.min.js"></script>
+
+		<script type="text/javascript" src="js/utils.js"></script>
+		<script type="text/javascript" src="js/StorageManager.js"></script>
+		<script type="text/javascript" src="js/statCharts.js"></script>
+		<script type="text/javascript" src="js/options.js"></script>
+
+		<script type="text/javascript">
+			var isIntervalSet = false;
+			var optionIntervalTimerId = "";
+			$(function() {
+				//done to get stats that are updated until NOW !
+				chrome.extension.getBackgroundPage().BackGroundManager.storeStats();
+				$("#tabs").tabs();
+				populateBlockSets();
+				populateWhiteListedUrls();
+				populateTags();
+				populateGenOptions();
+				populateLockDown();
+				setupDatePickers();
+				setupAllDialogs();
+			});
+		</script>
+	</head>
+
+	<body>
+		<div id='challengeDiv' style="display:none;">
+			<input type='hidden' id='dialogBlockSet' />
+			<input type='hidden' id='editOrDeleteBlockSet' />
+			
+			<!-- really cool way to disallow select - check the css for details ! -->
+			<input type='text' readonly='true' id='origText' size='150' value='' class="no-select"/>
+			<br/>
+			<label for='userEnteredText'>Enter The Text Show Above !</label>
+			<br/>
+			<input type='text' id='userEnteredText' size='150' value='' />
+		</div>
+		
+		<!-- 
+			Chrome behaves erratically when using alert and confirm in extensions - this div is an attempt to override 
+				it using jquery dialogs. So fill the confirmMessage with any text used for confirmation.
+		-->	
+		<div id='confirmMessageDiv' style="display:none;">
+			<input type='hidden' id='operationToPerform' />
+			<input type='hidden' id='operandVal' />
+			<span id='confirmMessage'></span>
+			<br/>
+		</div>
+
+		<div id="tabs"> 
+			<ul>
+				<li><a href="#tabs-1">Blocked URLs</a></li>
+				<li><a href="#tabs-2">Whitelisted URLs</a></li>
+				<li><a href="#tabs-3">Tags</a></li>
+				<li><a href="#tabs-4">General Options</a></li>
+				<li><a href="#tabs-5">LockDown</a></li>
+				<li><a href="#tabs-6">Validate Regular Expression</a></li>
+				<li><a href="#tabs-7">Statistics</a></li>
+				<li><a href="#tabs-8">Instructions</a></li>
+			</ul>
+
+			<div id="tabs-1">
+				<div id="blockedURLsBody" class="section_body"> 
+					<table border=0 nowrap cellspacing ='0' cellpadding='0' class='ModuleSection' align='center' width='100%'>
+						<tr class='tDataGridHeader' >
+							<td colspan="2">Details Of URLs To Block</td>
+						</tr>
+						<tr class='tDataGridElement'>
+							<td>Block Set Name * </td>
+							<td>
+								<input type="text" class='GeneralTextBox' id="blockSetName" name="blockSetName" maxlength="100" size="100" />
+								<input type="hidden" id="blockSetInternalName" name="blockSetInternalName"  />
+							</td>
+						</tr>
+						<tr class='tDataGridElement'>
+							<td>URLs * </td>
+							<td>
+								<textarea rows="8" cols="100" class='GeneralTextArea' id="URLToBeBlocked" name="URLToBeBlocked">&nbsp;</textarea>
+							</td>
+						</tr>
+						<tr class='tDataGridElement'>
+							<td>
+					Block Time *
+							</td>
+							<td>
+								<input type="text" class='GeneralTextBox'   id="timeToBeBlocked" name="timeToBeBlocked" maxlength="200" size="100" />
+								(Eg 0900-1700,1900-2100 to block during 9AM-5PM and 7PM-9PM)
+							</td>
+						</tr>
+						<tr class='tDataGridElement'>
+							<td>
+					Max Time : 
+							</td>
+							<td>
+					<input type ="text" class='GeneralTextBox' id="maxTimeADay" name="maxTimeADay" maxlength="4" size="4"/> minutes for every
+								<select id='maxTimeUnit' name='maxTimeUnit' class='GeneralSelectBox' >
+									<option value='1'>1 hour</option>
+									<option value='2'>2 hours</option>
+									<option value='3'>3 hours</option>
+									<option value='4'>4 hours</option>
+									<option value='6'>6 hours</option>
+									<option value='12'>Half Day (12 hours)</option>
+									<option value='24'>1 Day (24 hours)</option>
+								</select>
+							</td>
+						</tr>
+						<tr class='tDataGridElement'>
+							<td>
+					Apply On Days *
+							</td>
+							<td>
+					<input type="checkbox" id="sun" name="sun" checked> Sunday 
+					<input type="checkbox" id="mon" name="mon" checked> Monday
+					<input type="checkbox" id="tue" name="tue" checked> Tuesday 
+					<input type="checkbox" id="wed" name="wed" checked> Wednesday 
+					<input type="checkbox" id="thu" name="thu" checked> Thursday 
+					<input type="checkbox" id="fri" name="fri" checked> Friday
+					<input type="checkbox" id="sat" name="sat" checked> Saturday 
+							</td>
+						</tr>
+						<tr>
+							<td>
+							Tags 
+							</td>
+							<td>
+								<select class='GeneralSelectBox' id='blockListAllTags'></select>
+								<input type='button' class='GeneralButton' id='addTagToBlockList' onclick='javascript:addTagToBlockListDiv();' value = 'Add Tag' />
+								<ul id='blockListTagsUl'></ul>
+							</td>
+						</tr>
+						<tr>
+							<td>
+							Added Tags 
+							</td>
+							<td>
+								<ul id='blockListTagsUl'></ul>
+							</td>
+						</tr>
+					</table>
+					<input type="button" class='GeneralButton' id="addToBlockList" name="addToBlockList" onclick ="javascript:addBlockSet();" value="Save URL"/>
+					<input type='button' class='GeneralButton' id='clearBlockListTags' onclick="javascript:clearBlockListUrlTags();" value="Clear Tags" />
+					<input type='button' class='GeneralButton' id='clearBlockList' onclick="javascript:clearBlockListBlock();" value="Clear All Fields" />
+				</div>
+				<p/>
+				<p/>
+				
+				<table id='allBlockSetsTbl' border=0 nowrap cellspacing ='0' cellpadding='0' class='ModuleSection' align='center' width='100%'>
+					<tr class='tDataGridHeader' >
+						<td colspan="2">Block Sets</td>
+					</tr>
+				</table>
+
+				
+			</div>
+
+
+
+			<div id="tabs-2">
+				<div id="whiteListedURLBody" class="section_body"> 
+					<table border=0 nowrap cellspacing ='0' cellpadding='0' class='ModuleSection' align='center' width='100%' >
+						<tr class='tDataGridHeader'>
+							<td colspan="3">Details Of White Listed URL</td>
+						</tr>
+						<tr class='tDataGridElement'>
+							<td>URL </td>
+							<td>
+								<input type = "textbox" id="whiteListedURL" size="75" maxLength = "100" />
+								<select class='GeneralSelectBox' id='whiteListAllTags'></select>
+								<input type='button' class='GeneralButton' id='addTagToWhiteList' onclick='javascript:addTagToWhiteListDiv();' value = 'Add Tag' />
+							</td>
+						</tr>
+						<tr class='tDataGridElement'>
+							<td>
+								Tags
+							</td>
+							<td>
+								<ul id='whiteListTagsUl'></ul>
+							</td>
+						</tr>
+					</table>
+					<input type='button' class='GeneralButton' id='addToWhiteList' onclick="javascript:addUrlToWhiteList();" value="Save URL" />
+					<input type='button' class='GeneralButton' id='clearWhiteListTags' onclick="javascript:clearWhiteListUrlTags();" value="Clear Tags" />
+					<input type='button' class='GeneralButton' id='clearWhiteList' onclick="javascript:clearWhiteListBlock();" value="Clear All Fields" />
+				</div>
+				<p/>
+				<p/>
+				<table id='allWhiteListedURLsTbl' border=0 nowrap cellspacing ='0' cellpadding='0' class='ModuleSection' align='center' width='100%'>
+					<tr class='tDataGridHeader' >
+						<td colspan="2">White Listed URLs</td>
+					</tr>
+				</table>
+			</div>
+
+
+
+			<div id="tabs-3">
+				<div id="tagsBody" class="section_body"> 
+					<table border=0 nowrap cellspacing ='0' cellpadding='0' class='ModuleSection' align='center' width='100%' >
+						<tr class='tDataGridHeader'>
+							<td>Tag </td>
+						</tr>
+						<tr class='tDataGridElement'>
+							<td><input type = "textbox" id="tagName" size="50" maxLength = "100" />
+							<input type='button' class='GeneralButton' id='addToTags' onclick="javascript:addTag();" value="Add Tag" />
+						</tr>
+					</table>
+				</div>
+				<p/>
+				<table id='allTagsTbl' border=0 nowrap cellspacing ='0' cellpadding='0' class='ModuleSection' align='center' width='100%'>
+					<tr class='tDataGridHeader' >
+						<td colspan="2">ExistingTags</td>
+					</tr>
+				</table>
+
+			</div>
+
+
+
+			<div id="tabs-4">
+				<div id="genOptionsBody" class="section_body"> 
+					<table border=0 nowrap cellspacing ='0' cellpadding='0' class='ModuleSection' align='center' width='100%' >
+						<tr class='tDataGridHeader'>
+							<td colspan="3">General Options</td>
+						</tr>
+						<tr class='tDataGridElement'>
+							<td>
+								<label for="modeOfBlocking">Mode Of Blocking </label> 
+								<input type='radio' name='modeOfBlocking' id='remove' value='remove' checked>Close Tab
+								<input type='radio' name='modeOfBlocking' id='showblocked' value='showblocked'>Show &quot;Site blocked&quot; page
+								<input type='radio' name='modeOfBlocking' id='redirect' value='redirect'>Redirect To URL
+								<input type='text' id='redirectUrl' name='redirectUrl' size='75' maxlength='200' />
+							</td>
+						</tr>
+						<tr class='tDataGridElement'>
+							<td>
+								Stop Timer after Chrome is inactive for 
+								<input type='text' id='maxInActiveTimer' maxlength='3' size='5' /> minutes.
+							</td>
+						</tr>
+						<tr class='tDataGridElement'>
+							<td>
+								Maximum Allowed minutes in a day for Blocked URLs : 
+								<input type='text' id='maxMinutesForBlockedUrls' maxlength='3' size='5' /> minutes.
+								<i>(If set to 0 , then the individual Blocked URL limits are used. See "Instructions" for more details) </i>
+							</td>
+						</tr>
+						<tr class='tDataGridElement'>
+							<td>
+								Length Of Challenge Text : 	
+								<select id='challengeLen' name='challengeLen' class='GeneralSelectBox' >
+									<option value='128'>128</option>
+									<option value='64'>64</option>
+									<option value='32'>32</option>
+									<option value='0'>0</option>
+								</select>
+								Characters
+								<i>(When editing a BlockSet when it is blocked, this determines the length of the Challenge) </i>
+							</td>
+						</tr>
+						<tr class='tDataGridElement'>
+							<td>
+								<label for="showBlockedURLs">Show blocked URLs in popup ?</label> 
+								<input type='radio' name='showBlockedURLs' id='showURLs' value='showURLs' checked> Yes
+								<input type='radio' name='showBlockedURLs' id='doNotShowURLs' value='doNotShowURLs'> No .
+								<i>(If 'Yes' is selected then clicking on 'Chrome Nanny' icon shows details about blocked and whitelisted URLs like time remaining)</i>
+							</td>
+						</tr>
+					</table>
+				
+					<input type='button' class='GeneralButton' id='saveGenOptions' onclick="javascript:saveGeneralOptions();" value="Save General Options" />
+				</div>
+			</div>
+			
+			<div id="tabs-5">
+				<div id="lockdownInfo" class="section_body"> 
+					<table border=0 nowrap cellspacing ='0' cellpadding='0' class='ModuleSection' align='center' width='100%' >
+						<tr class='tDataGridHeader'>
+							<td>LockDown Information &nbsp;
+							&nbsp;<input type='button' class='GeneralButton' id='refreshLockDownDtlsBtn' onclick='javascript:refreshLockDownDtls();' value = 'Refresh' />
+								
+							</td>
+						</tr>
+						<tr class='tDataGridElement'>
+							<td><span id='lockDownInfoText'></span></td>
+						</tr>
+					</table>
+				</div>
+				<p/>
+				<table id='lockDownConfigure' border=0 nowrap cellspacing ='0' cellpadding='0' class='ModuleSection' align='center' width='100%'>
+					<tr class='tDataGridHeader' >
+						<td colspan="1">Configure LockDown
+						&nbsp;<input type='button' class='GeneralButton' id='selectAllLockDownBtn' onclick='javascript:selectAllLockDown();' value = 'Select All' />
+						&nbsp;<input type='button' class='GeneralButton' id='unSelectAllLockDownBtn' onclick='javascript:unSelectAllLockDown();' value = 'UnSelect All' />
+						</td>
+					</tr>
+					<tr class='tDataGridElement'>
+					<td>
+						<div id='allBlockSetsToLockDown'>
+						</div>
+					</td>
+					</tr>
+
+					<tr class='tDataGridElement'>
+					<td> 
+						<b>Duration:</b>&nbsp; <select id='lockDownHrs'></select> Hours <select id='lockDownMins'></select>minutes.  &nbsp; 
+						<input type='button' class='GeneralButton' id='beginLockDownBtn' onclick='javascript:beginLockDown();' value = 'Begin LockDown' />
+					</td>
+					</tr>
+
+					
+				</table>
+
+			</div>
+
+			<div id="tabs-6">
+				<div id="validateRegExpBody" class="section_body"> 
+					<table border=0 nowrap cellspacing ='0' cellpadding='0' class='ModuleSection' align='center' width='100%' >
+						<tr class='tDataGridHeader'>
+							<td colspan="3">Validate Regular Expressions</td>
+						</tr>
+						<tr class='tDataGridElement'>
+							<td width='20%'>
+								<label for="modeOfBlocking">Regular Expression for URL *</label> 
+							</td>
+							<td>
+								<input type='text' id='regExpUrl' name='regExpUrl' size='75' maxlength='150' />
+								(Eg : google.*) <i>Remember to use ".*" instead of  "*" </i>
+							</td>
+						</tr>
+						<tr class='tDataGridElement'>
+							<td width='20%'>
+								<label for="urlToTest">Test URL</label> 
+							</td>
+							<td>
+								<input type='text' id='urlToTest' name='urlToTest' maxlength='150' size='75' /> 
+								(Eg : google.com)
+							</td>
+						</tr>
+					</table>
+				
+					<input type='button' class='GeneralButton' id='validateRegExpBtn' onclick="javascript:validateRegExp();" value="Test Regular Expression" />
+					<input type='button' class='GeneralButton' id='resetRegExpFldsBtn' onclick="javascript:resetRegExpFlds();" value="Reset RegExp Fields" />
+
+					<p/>
+					<p/>
+
+				<table  border=0 nowrap cellspacing ='0' cellpadding='0' class='ModuleSection' align='center' width='100%'>
+					<tr class='tDataGridHeader' >
+						<td colspan="2">Result</td>
+					</tr>
+					<tr>
+						<td width='20%'>RegExp Error :</td>
+						<td><span id='errorResultSpan'></span></td>
+					</tr>
+					<tr>
+						<td width='20%'>Match :</td>
+						<td><span id='matchResultSpan'></span></td>
+					</tr>
+
+				</table>
+				
+				<p/>
+				<p/>
+
+				<table  border=0 nowrap cellspacing ='0' cellpadding='0' class='ModuleSection' align='center' width='100%'>
+					<tr class='tDataGridHeader' >
+						<td colspan="2">Sample Regular Expressions</td>
+					</tr>
+
+					<tr>
+						<td width='20%'>google.*</td>
+						<td>
+							Matches google.com , google.co.in, google.com/reader , picasaweb.google.com 
+							<br/>
+							Does not match any URL that does not have the word google in it.
+							<p/>
+						</td>
+					</tr>
+					<tr>
+						<td width='20%'>http://www.google.*/reader</td>
+						<td>
+							<b>Note :</b> Chrome Nanny internally strips http,https and www. So this regexp is equivalent to <i><b>google.*/reader </b></i>
+							<br/>
+							Matches http://www.google.com/reader/view
+							<br/>
+							Does not match google.com, google.co.in, picasaweb.google.com, reader.google.com
+							<p/>
+						</td>
+					</tr>
+					<tr>
+						<td width='20%'>*.wordpress.com</td>
+						<td>
+							Does not match <b><i>anything</i></b>. Worse yet, it can prevent validtion of other blocked URLs. If you verify this URL , you get an error "Invalid regular expression: /*.wordpress.com/: Nothing to repeat". This is because , the "*" operation needs some character to repeat and when you dont give any, it errors out.
+							<p/>
+						</td>
+					</tr>
+					<tr>
+						<td width='20%'>.*.wordpress.com</td>
+						<td>
+							Correct way to block all wordpress.com blogs. Here the ".*" matches any characters that come before the domain and hence it will block all of them. If you want to allow say, "saravananthirumuruganathan.wordpress.com" but block other wordpress blogs, then create a ".*wordpress.com" blocked URL and make "saravananthirumuruganathan.wordpress.com" as a whitelisted URL.
+							<p/>
+						</td>
+					</tr>
+
+				</table>
+
+				</div>
+			</div>
+
+
+			<div id="tabs-7">
+				<div id="statsBody" class="section_body"> 
+					<table border=0 nowrap cellspacing ='0' cellpadding='0' class='ModuleSection' align='center' width='100%' >
+						<tr class='tDataGridHeader'>
+							<td colspan="3">Statistics</td>
+						</tr>
+						<tr class='tDataGridElement'>
+							<td>
+								<label for="from">From</label> 
+								<input type="text" id="from" name="from"/> 
+								<label for="to">To</label> 
+								<input type="text" id="to" name="to"/> 	
+							</td>
+						</tr>
+						<tr class='tDataGridElement'>
+							<td>
+								<label for="chartType">Chart Type :</label> 
+								<input type='radio' name='chartType' id='barChartRadio' value='B' checked>Bar Chart
+								<input type='radio' name='chartType' id='pieChartRadio' value='P'>Pie Chart
+							</td>
+						</tr>
+					</table>
+					<input type="button" class='GeneralButton' id="calcCharts" name="calcCharts" onclick='javascript:plotCharts();' value='Plot !' /> 
+				</div>
+				<div>
+					<div class="jqPlot" id="blockListChartSpace" style="height:50px; width:640px;"></div>
+					<div class="jqPlot" id="blockListChart" style="height:480px; width:640px;margin-left:auto;margin-right:auto;"></div>
+					<div class="jqPlot" id="blockSetChartSpace" style="height:50px; width:640px;"></div>
+					<div class="jqPlot" id="blockSetChart" style="height:480px; width:640px;margin-left:auto;margin-right:auto;"></div> 
+					<div class="jqPlot" id="whiteListChartSpace" style="height:50px; width:640px;"></div>
+					<div class="jqPlot" id="whiteListChart" style="height:480px; width:640px;margin-left:auto;margin-right:auto;"></div> 
+					<div class="jqPlot" id="tagChartSpace" style="height:50px; width:640px;"></div>
+					<div class="jqPlot" id="tagChart" style="height:480px; width:640px;margin-left:auto;margin-right:auto;" ></div>
+				</div>
+			</div>
+
+			<div id="tabs-8">
+				<div id="instructionsBody" class="section_body"> 
+
+						<b>Chrome Nanny is developed by <a href='http://saravananthirumuruganathan.wordpress.com/' target='_blank'>Saravanan Thirumuruganathan</a>. Please visit the post <a href='http://saravananthirumuruganathan.wordpress.com/2010/05/05/instructions-for-chrome-nanny-a-leech-block-like-extension-for-chrome/' target='_blank'>Instructions For Chrome Nanny</a> for up to date and additional information. For the features planned in future checkout the <a href='http://saravananthirumuruganathan.wordpress.com/2010/08/05/chrome-nanny-road-map/' target='_blank'>Chrome Nanny's Roadmap.</a></b> <p/>
+
+					First of all, Thanks for using Chrome Nanny !
+					<p/>
+
+					Chrome Nanny is a Chrome extension which can keep your browsing habits in check. Do you spend more time on facebook than on work ? Do you spend time more time in Google Reader or Digg and later wish you had not spent as much time ? Do you want to know how much you spent on Flick ? If so , Chrome Nanny is for you. Using Chrome Nanny, you can limit yourself from going to some sites on pre determined times or limit the time you spend on some sites. If you do not want to block a site, but want to know how much time you spend there, Chrome Nanny can do that for you too !  If you have used Leech Block for Firefox , you can recognize that Chrome Nanny does something similar but with a twist.
+					<p/>
+
+					<b>Note :</b> If you are in Google Chrome version 5 or more , then enable this extension to run in Incognito mode too! Chrome Nanny will not like it if you visit blocked sites in Incognito mode. Will she ?
+
+					<p/>
+
+<h2 align='center'>FAQ</h2>
+I have added some FAQs based on the comments in the blog post. I will keep them updated as the comments evolve. <p/>
+
+<b>1. How do I block a URL (eg : http://www.facebook.com)  for a specific period of time ? </b><br/>
+
+Lets say you want to block facebook between 9AM-5PM. Go to Chrome Nanny's Options page and select Blocked List tab. Enter facebook.com in the URL. Convert time to be blocked to hhmm format in military time. It becomes 0900-1700. If there are multiple times, then append them with commas. Eg 0900-1200,1300-1700.  Select the days on which facebook has to be blocked. Click "Save URL". <p/>
+
+<b>2. How do I limit accessing facebook to 1 hour a day ? </b> <br/>
+
+Suppose you want to access facebook all day but want to limit it to 1 hour at the most in a day. Go to Chrome Nanny's Options page and select Blocked List tab. Enter facebook.com in the URL.  Enter 0000-0000 in the Blocked Time. Enter 60 in the "Max Time In a Day". Click "Save URL". <p/>
+
+
+<b>3. How do I block a url for specific interval but also want to limit the time spent on it in a day ?</b><br/>
+
+This is achieved by a combination of 1 and 2. Lets say you want to block facebook between 9AM-5PM. In the remaining time you want to limit your browsing to 1 hour. To do that, enter facebook.com in the blocked URL , block time as 0900-1700, max time in a day as 60. <p/>
+
+<b>4. How do I block all .org sites except wikipedia ?</b><br/>
+
+This can be done using regexp. In the block url , enter .*.org as the url. Enter the appropriate block times and save the blockset. Now go to “White List” tab and enter “wikipedia.org” as white listed url. Chrome Nanny will block all .org sites except wikipedia. <p/>
+
+<b>5. Is http, https, www needed in the blocked URL ?</b><br/>
+
+No. They are really not needed and Chrome Nanny internally strips them when doing the matching. So facebook.com will block facebook and there is no need to enter the full URL as http://www.facebook.com . <p/>
+
+<b>6. Chrome Nanny Crashed my Chrome</b> <br/>
+
+Open Chrome Nanny's options page. In the "General Options" tab,  check the value of "Mode of Blocking". If it is remove (default) then Chrome Nanny will close the tab if you try to access a blocked URL or if your daily quota is up. If there is a single tab in the window, it might look Chrome has crashed. It has not. <p/>
+
+<b>7. Chrome Nanny closed my tab</b> <br/>
+
+Chrome Nanny's default mode of blocking is to remove the offending tab. If you want to redirect to some motivational web page, you can certainly do so. Open Chrome Nanny's options page. In the "General Options" tab,  select "Redirect" as the value for "Mode of Blocking". Enter the redirect url. Note that you cannot redirect to a URL that is blocked. <p/>
+
+<b>8. Chrome Nanny did not block my page</b> <br/>
+
+There are multiple possible reasons for this scenario. <br/>
+
+<b>Case 1:</b> Check if the settings are correct. Obvious, but it does not hurt to say again. Is Chrome Nanny disabled ? Are you in Incognito mode ? Should this URL should be blocked now ? You can click on Chrome Nanny's popup icon to get more details on which URLs are blocked now. <br/>
+
+<b>Case 2 :</b> Is the blocked URL a substring of the tab's current URL ? For eg having facebook.com will block http://www.facebook.com/home.php , http://www.facebook.com/settings.php and so on. For some websites, the URL with which we access may not be the final URL.  Eg reader.google.com may not work. Enter blocked url as google.com/reader. Enter mail.google.com instead of gmail.com and login.live.com instead of hotmail.com and so on. <br/>
+
+<b>Case 3 : </b>Check if blocked list and white list URLs clash. <br/>
+
+White listed URLs take precedence and if a URL matches white list and block list then it is allowed. A sample scenario is to block Google reader but allow all other google pages. To do this entering google.com/reader in blocked list is enough. If you add google.com in white list , then Google Reader is also allowed as it matches the white listed URL "google.com" . <br/>
+
+<b>Case 4 :</b> Check if any of your blocked or white listed URLs using regular expressions (eg using "*" in the URL). If so, validate it in "Validate Regular Expressions" tab. <i>Note that an error in any of the regexp URLs can cause Chrome Nanny to not block other URLs.</i><br/>
+
+<b>Case 5 : </b> Click on Chrome Nanny's popup icon (the one that looks like a clock). Check if the URL is blocked now. If it is , then Chrome Nanny will block the URL sooner or later. Chrome Nanny uses callback functions of Chrome's events to perform the blocking. If they are not called , Chrome Nanny might not block the tab immediately . Don't worry : Chrome Nanny has other checks too ! It checks all the tabs every minute and blocks tabs if necessary. Also if you switch to another tab or refresh the tab , the tab is checked again. So if Chrome Nanny does not block it immediately then give it some time. If the tab is not blocked even after one minute (Although, Chrome Nanny's popup says otherwise) then please check the troubleshooting section to see how to contact the developer about the error.
+
+<p/>
+
+<b>9. Chrome Nanny blocked my page before the deadline is up ! </b><br/>
+Chrome Nanny has a feature which allows you to specify total time you can spend on <b>all</b> blocked URLs in a day. Suppose you set it to 60 minutes. Then if the total time you have spent on all blocked URLs exceed 60 minutes, then <b>all</b> blocked URLs will be blocked immediately, even though individual URLs may have some more time left. ie This feature overrides the individual URL settings. To disable this feature , set <b>Maximum Allowed minutes in a day for Blocked URLs</b>  to 0 in <b>General Options</b> tab.
+<p/>
+
+<b>10. Can I block a subdomain or a specific url ?</b> <br/>
+
+Sure. If you want to block Google Reader alone enter google.com/reader in the blocked list. This will allow all Google pages but will block Google Reader. <p>
+
+<b>11. Can I block certain patterns of URLs ? </b><br/>
+
+A sample scenario is this : I want to block all Google searches for games but other queries are ok.  Yes, you can do it by having a blocked URL as "google.com/search.*games" .  <p/>
+
+<b> 12. Some examples for regular expressions </b><p/>
+
+Please note that you need to use ".*" whenever you want to use "*" in the regular expression.  (Eg .*.wordpress.com instead of *.wordpress.com ) <p/>
+
+a) <b>google.*</b> <br/>
+Matches google.com , google.co.in, google.com/reader , picasaweb.google.com  <br/>
+Does not match any URL that does not have the word google in it. <p/>
+
+b)  <b>http://www.google.*/reader</b> <br/>
+<b>Note :</b> Chrome Nanny internally strips http,https and www. So this regexp is equivalent to <b>google.*/reader </b>
+<br/>
+Matches http://www.google.com/reader/view
+<br/>
+Does not match google.com, google.co.in, picasaweb.google.com, reader.google.com
+<p/>
+
+
+c) <b>*.wordpress.com</b> <br/>
+		Does not match <b>anything</b>. Worse yet, it can prevent validtion of other blocked URLs. If you verify this URL , you get an error "Invalid regular expression: /*.wordpress.com/: Nothing to repeat". This is because , the "*" operation needs some character to repeat and when you dont give any, it errors out.
+		<p/>
+d) <b>.*.wordpress.com</b> <br/>
+		Correct way to block all wordpress.com blogs. Here the ".*" matches any characters that come before the domain and hence it will block all of them. If you want to allow say, "saravananthirumuruganathan.wordpress.com" but block other wordpress blogs, then create a ".*wordpress.com" blocked URL and make "saravananthirumuruganathan.wordpress.com" as a whitelisted URL.
+		<p/>
+e) <b>test</b><br/>
+This will match any URL that contains the word test. For eg test.com, blahtest.com, foo.com/test , bar.com/g.php?val=test etc.
+	<p/>
+
+<b>13. I do not want the Challenge that occurs when I try to edit/delete a blockset when it is blocked ! </b> <br/>
+The 64 character (default) challenge that Chrome Nanny raises when you try to edit/delete a blockset when it is currently blocked is one of the few hurdles in your way before you start whiling away your time ! I do understand there are many "legal" scenarios like experimenting with Chrome Nanny when challenge is an annoyance. So use the following feature only when needed. Go to General Options and then Length Of Challenge Text . Reduce the length 0. To prevent abuse, Chrome Nanny will ask for challenge once. If the length is changed to 0, then further changes do result in a challenge. Once you are done with the playing around, please do increase the challenge text length.
+<p/>
+
+<b>14. I do not want the blocked URLs to be displayed in the popup ! </b><br/>
+By default, Chrome Nanny will show the URLs currently blocked, how much time left in other blocked URLs and other details. If you do not want it to be displayed in the icon popup, go to Options , click 'General Options' tab, and select 'No' for the field 'Show blocked URLs in popup ?' . After this, when you click on the Chrome Nanny icon, it will display a bland message instead of the blocked URL details.
+<p/>
+
+
+<b>15. I think I have found a new bug ! Or How do I troubleshoot Chrome Nanny ?</b><br/>
+I have tested Chrome Nanny extensively but bugs do creep up. Please check if you can reproduce the error consistently. If so, please point out the bug and  the steps to reproduce in any of the following ways : comment at  <a href='https://chrome.google.com/extensions/detail/gpdgmmdbbbchchonpfanphofpplhmcmn'>Chrome Nanny's extension page</a>  OR comment in <a href='http://saravananthirumuruganathan.wordpress.com/2010/05/05/instructions-for-chrome-nanny-a-leech-block-like-extension-for-chrome/'>Chrome Nanny's instructions blog post</a> OR email the developer at saravanan DOT thirumuruganathan AT gmail DOT com . It would be great if you can email the settings of Chrome Nanny also. Easiest way is to email the file chrome-extension_gpdgmmdbbbchchonpfanphofpplhmcmn_0.localstorage at ~/.config/google-chrome/Default/Local Storage (If using Linux and Chrome) or ~/.config/google-chrome/Default/Local Storage (using Linux and Chromium) or at C:\Users\<username>\AppData\Local\Google\Chrome\User Data\Default\Local Storage (In Windows) . <p/>
+
+Optionally you can also give me the logs when the bug occurs. To get Chrome Nanny's logs , click on the Wrench icon - Select Extensions. Go to Chrome Nanny and click on "background.html" . This will open Chrome's developer tools.  Now try reproducing the bug and copy the log it generates. This will be very helpful for additional debugging. 
+<p/>
+
+<b>16. I have a patch for feature X . How do I send it to you ? </b><p/>
+It is wonderful that you took time to write a patch. Please send an email to saravananDOTthirumuruganathanATgmailDOTcom with the patch details and the file. I will test it and apply it to the extension. The latest code of Chrome Nanny will can be downloaded from the repository <b><a href='https://code.google.com/p/saravanant/source/browse/trunk/chrome/ChromeNanny/chromeNanny_src.zip'>here</a></b> . If you need additional help on the code please take a look at my post <b><a href='http://saravananthirumuruganathan.wordpress.com/2010/05/01/how-to-read-the-source-code-of-chrome-and-firefox-extensions/'>"How to Read the Source Code of Chrome and Firefox Extensions" . </a></b> 
+
+<p/>
+
+<h2 align='center'>Instructions</h2>
+					
+					<h3>General Options : </h3> 
+					<b>Mode Of Blocking</b> decides what to do if you are visiting a website during blocked hours or after exhausting all the time you allocated yourself for the site. The default option is to <i>remove</i> the tab which may not be ideal for you. If you want the tab to be redirected to some motivational sites then you can select the <i>redirect</i> option and give a redirect url. You can specify a web page or a local html page (using file:// prefix)  Note that if you have only one tab, mode of block is"remove" and the url is blocked now, the entire window will be closed. <br/>
+
+
+					<b>Stop Timer after Chrome is inactive for x minutes </b> - Chrome does not notify when you minimize a Window/Tab. Chrome Nanny does not want you to lose the minutes you were not at the desk. You can enter some number in this field. For eg, if you are not active for 5 minutes, then Chrome Nanny will stop tracking the minutes till you come back. <br/>
+
+					<b>Maximum Allowed minutes in a day for Blocked URLs</b> - Use this field if you want to set a single limit to the time you spend on Blocked URLs. This value will override the individual Blocked URL limits. As an example , lets say you added facebook.com to Blocked URL list and set <i>Max Time In a day</i> as 60 minutes. If you now set, <i>Maximum Allowed minutes in a day for Blocked URLs</i> as 30 minutes, then facebook.com will not be accessible after 30 minutes . The same holds when you have multiple Blocked URLs. If the sum of time spent on all the URLs exceed this field, then <b>all</b> Blocked URLs will be blocked.
+					<br/>
+					<b>Length Of Challenge Text </b> - This determines the length of the Challenge text that Chrome Nanny will ask if you try to edit/delete a blockset when it is currently blocked. Reducing this field will also decrease the length of the challenge text. This field was added because in "some" scenarios (eg when playing with Chrome Nanny) , Challenges are an annoyance. Please use this field with discretion. To make changing this field a little hard to use, when you reduce the length of the Challenge, Chrome Nanny will perform a Challenge. So if you try to reduce a 64 character challenge to 32 character, you will be challenged with a 64 character random string before being allowed to change it. Making the length as 0, removes all challenges. 
+					<br/>
+
+
+					<p/>
+					<h3>Tags: </h3>
+					Tags are a way to aggregate individual URL statistics. For eg you may spend lot of time on nytimes.com and Google news. If you want to aggregate the results into a "news" tag, then you can use the Tags tab for it. An url can belong to multiple tags.
+
+					<p/>
+					<h3>Blocked URLs </h3>
+					Do you think, you spend too much time on Facebook ? This is the tab where you can use to limit your visits. <br/>
+
+					<b>Block Set Name : </b> : Chrome Nanny allows you to group multiple URLs into a block set. Enter a name that you think summarizes the list of URLs. Eg News, Social Networks, Blogs etc <br/>
+
+					<b>URLs : </b>  Add the websites in this blockset here. You need not add a full site url. So facebook.com will be enough. No need to add the whole "http://www.facebook.com". Note that the url must be the "final" URL of the page that you want to be blocked. This means that <i>gmail.com</i> is better written as <i>mail.google.com</i> , <i>reader.google.com</i> is better written as <i>google.com/reader</i> and so on. You can add as many URLs you want in the text area. Separate them by newline (Enter key). ie a.com enter b.com blocks both a.com and b.com.  <br/>
+
+
+					<b>Block Time : </b> This is the most important information. This decides when the block set should be blocked. So if you want it to be blocked from 9 AM to 5 PM, then you encode it as 0900-1700. This is nothing but expressing start and end time as hhmm-hhmm in the 24 hour format. You can add multiple time blocks by separating them by comma. So to block between 9AM-5PM and 7PM-9PM, you write 0900-1700,1900-2100. Note that during the time a block set is blocked, you will <i>not</i> be able to edit or delete the block set. <br/>
+
+					<b>Max Time In A Day :</b>  This an optional field. If you want to limit the time you spend on a site during your allowed time, then this field is useful. For eg, taking the example above, if you want to block between 9AM-5PM but you want to limit your browsing to 1 hour in the allowed time (12 AM-8:59 AM , 5:01 PM-11:59 PM)  then you enter 0900-1700 in Block Time and 60 in the Max Time In A Day. <br/>
+
+					<b>Apply On Days : </b> Chrome Nanny understands that you may want to relax on weekends. So if you want your strict rules to apply only on weekdays, uncheck the weekends here. <br/>
+
+					Note that you can edit or delete the block set any time when it is not blocked. <br/>
+
+					<b>Add Tag :</b> If you add any tags in the Tags tab, then you will see those tags here. You can add any number of tags for the block set here. Just select the tag and keep clicking "Add Tag". A block set can have multiple tags. <br/>
+					<p/>
+
+
+					<h3>White Listed URLs</h3> 
+					If you do not want to block a URL but want to find how much time you spend each day, then use the White Listed URLs tab. Any URL added here is not blocked, but will be tracked and can be charted. <br/>
+
+					<b>URL : </b> Enter the URL of the site you want to be tracked. Again, you can enter just the domain name to track any page in the site. <br/>
+					<b>Add Tag : </b> As with Blocked URLs , you can add tags to White Listed URLs too !
+
+					<p/>
+
+					<h3>Statistics </h3> 
+					If you want to visualize how you spent your days with respect to the URLs you entered in Chrome Nanny, then this is the tab for you. You can enter the date range and Chrome Nanny will give you four charts. One each for Blocked URLs, Block Sets, White Listed URLs and tags. You can select between Bar Chart and Pie Chart !. <br/>
+
+					
+					<h3>Validate Regular Expression</h3> 
+					If you are going to use a regular expression in the URL, then you can use this tab to validate it. A bad regexp can cause syntax error in the code and *might* cause Chrome Nanny not to block other URLs.  <p>
+
+					<b>Validating a Regular Expression :  </b> Enter your regexp in "Regular Expression for URL" and click "Test Regular Expression". Check the field "RegExp Error". If there is any error in regexp, it will be displayed here.  <br/>
+					<b>Verify if an URL is blocked : </b> Enter the regexp in "Regular Expression for URL" . Enter URL to be tested in "Test URL". Click "Test Regular Expression". Check the fields "RegExp Error" and "Match". 
+
+				</div>
+			</div>
+
+
+		</div>
+	</body>
+</html>

@@ -1,0 +1,13 @@
+{
+	"name": "Chrome Nanny",
+	"version": "0.988",
+	"description": "Chrome Nanny allows you to be more productive and less distracted by blocking sites.",
+	"background_page": "background.html",
+	"options_page": "options.html",
+  	"permissions": ["tabs"] ,
+	"browser_action": 
+	{
+		"default_icon": "icon.png",
+		"popup": "popup.html"
+	}
+}

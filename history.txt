@@ -1,0 +1,10 @@
+0.8   [May 5 2010]  - Initial Version
+0.84  [May 6 2010]  - Fixed bug where exception was thrown when no data to chart
+0.88  [May 7 2010]  - Added white list url to popup and added a 64 character challenge to edit or delete url during blocked time.
+0.92  [May 14 2010] - Added RegExp support.
+0.95  [May 21 2010] - Added option to allow redirect to local files. Also added a feature to have a master block time for all blocked URLs.
+0.96  [Jun 06 2010] - Added block sets feature, add a new chart for blocksets, increased size of block time.
+0.964 [Aug 22 2010] - Added a field to control length of Challenge. If set to 0, no challenges will be raised. Also sorted block sets by name.
+0.98  [Sep 19 2010] - Redirect to LeechBlockish page by default (thanks Hannes!) , allow redirect to about:*, optionally hide blocked sites and other UI improvements.
+0.984 [Jan 24 2011] - Added option to limit sites by hour. Other cosmetic changes.
+0.988 [Mar 06 2011] - Added option for lockdown of blocksets.

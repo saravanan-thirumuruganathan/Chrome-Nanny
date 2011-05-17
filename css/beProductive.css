@@ -1,0 +1,228 @@
+/* HeaderMainFooter */
+body
+{
+	font-family: Arial, Helvetica, sans-serif; 
+	margin: 0px;
+	font-size: 12px;
+	
+}
+
+form {
+margin:0;
+padding:0;
+}
+
+
+/* Header */
+.Header
+{
+	background: #f0ab00 url(../images/HeaderBgRepeat.jpg) repeat-y;
+	border-top: #e3e3e3 5px solid;
+}
+tr.GeneralTableHeader
+{
+	background-color: #cccc99;
+	font-family: Arial;
+	font-weight: bold;
+	font-size: 12px;
+	position: static;
+	height: 22px;
+}
+
+.tHeader 
+{
+	border-bottom:1px solid #C9D7F1;
+	padding-bottom:3px;
+}
+.main {
+font-size:14px;
+}
+
+.sub {
+font-size:14px;
+padding-right:5px;
+}
+.section {
+	border-color:#C1D2E6;
+	border-width:thin;
+	color:#6A88B1;
+	font-variant:small-caps;
+	font-weight:bold;
+	padding:2px;
+}
+
+
+/* Table Data Grid */
+
+tr.tDataGridHeader
+{
+	background: #3E5C7D url(../images/summary-tablecaption-background.png) repeat-x scroll 0 0;
+	color: #FFFFFF;
+	font-family: verdana,sans-serif;
+	/*font-weight: bold;*/
+	font-size: 11px;
+	position: static;
+	height: 22px;
+	text-transform:uppercase;
+}
+
+tr.tDataGridRow
+{
+	background-repeat: repeat-x;
+	font-family: Arial;
+	font-size: 12px;
+	position: static;
+	height: 25px;
+	border-bottom: activeborder 1px solid;
+}
+
+td.tDataGridElement
+{
+	background-repeat: repeat-x;
+	font-family: Arial;
+	font-size: 12px;
+	position: static;
+	height: 25px;
+	border-bottom: activeborder 1px solid;
+}
+
+table.ModuleSection
+{
+	font-family: Verdana, Arial, sans-serif;
+	font-size: 11px;
+	padding: 2px;
+	text-indent: 0px;
+	text-align: left;
+	color: black;
+	background-color: #EFF2F6;
+	border:1px solid #D3DCE4;
+	margin:-1px 0 0;
+	margin-left:auto;
+	margin-right:auto;
+}
+
+.SectionHeader
+{
+	font-family: Verdana, Arial, sans-serif;
+	font-size: 11px;
+	font-weight: bold;
+	border:1px solid #768FAA;
+	color:#FFFFFF;
+	padding-left: 10px;
+	padding: 5px;
+	background:#9EB2C5 url(../images/table-heading-background.png) repeat-x scroll 0 0;
+}
+input.GeneralButton
+{
+	font-family:"lucida grande",tahoma,verdana,arial,sans-serif;
+	font-size: 11px;
+}
+
+
+select.GeneralSelectBox
+{
+	font-family:"lucida grande",tahoma,verdana,arial,sans-serif;
+	font-size: 11px;
+	height: 20px;
+	padding: 1px;
+	background-color: #ffffff;
+	border:1px solid #999999;
+}
+input.GeneralTextBox
+{
+	font-family:"lucida grande",tahoma,verdana,arial,sans-serif;
+	font-size: 11px;
+	padding: 2px 3px;
+	border:1px solid #999999;
+}
+input.ReadOnlyTextBox
+{
+	font-family:"lucida grande",tahoma,verdana,arial,sans-serif;
+	font-size: 11px;
+	
+	background-color: #fffacd;
+	border:1px solid #999999;
+	padding: 2px 2px;
+}
+
+textarea.GeneralTextArea
+{
+	font-family:"lucida grande",tahoma,verdana,arial,sans-serif;
+	font-size: 11px;
+	border:1px solid #999999;
+	padding: 2px;
+}
+
+textarea.ReadOnlyTextArea
+{
+	font-family:"lucida grande",tahoma,verdana,arial,sans-serif;
+	font-size: 11px;
+	background-color: #fffacd;
+	border:1px solid #999999;
+	padding: 2px;
+}
+.general-label
+{
+	font-family:"lucida grande",tahoma,verdana,arial,sans-serif;
+	font-size: 11px;
+}
+
+
+tr.TemplateItemHeader
+{
+	background-repeat: repeat-x;
+	font-family: Arial;
+	font-size: 12px;
+	position: static;
+	height: 20px;
+	border-bottom: activeborder 1px solid;
+	background-color: #f0edde;
+}
+td.TemplateItemHeader
+{
+	border-bottom: activeborder 1px solid;
+}
+
+
+
+/* Home Page */
+#t_home_section
+{
+	padding: 4px;
+	background: #E6EFF7 none repeat scroll 0 0;
+	border:1px solid #ADCBFF;
+}
+#t_home_section_welcome
+{
+	padding: 4px;
+	background: #FFF7D7 none repeat scroll 0 0;
+	border:1px solid #FFDCA9;
+}
+
+
+div.tooltip, div.tooltip-dialog { 
+    background-color: #002; 
+    outline: 1px solid #669;
+    border: 2px solid #fff;
+    padding: 10px 15px; 
+    width: 200px; 
+    display: none; 
+    color: #fff; 
+    text-align: left; 
+    font-size: 12px; 
+    position: absolute;
+ 
+    /* outline radius for mozilla/firefox only */ 
+    outline-radius: 4px; 
+    -moz-outline-radius: 4px; 
+    -webkit-outline-radius: 4px; 
+}
+
+/* Courtesy : http://stackoverflow.com/questions/2212542/how-can-i-prevent-selecting-text-in-google-chrome */
+.no-select
+{
+   -moz-user-select: none;
+   -khtml-user-select: none;
+   -webkit-user-select: none;
+   user-select: none;
+}
